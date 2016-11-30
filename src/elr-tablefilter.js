@@ -1,76 +1,91 @@
-(function($) {
-    window.elrTableFilter = function(params) {
-        var self = {};
-        var spec = params || {};
-        var tableClass = spec.tableClass || 'elr-searchable-table';
-        var searchInput = spec.searchInput || 'elr-search-table';
-        var $table = $('.' + tableClass);
-        var $fullRows = $table.find('tbody tr');
-        var $inputs = $table.find('th').find('.' + searchInput);
+import elrUtlities from 'elr-utilities';
+const $ = require('jquery');
 
-        var getFilterValues = function($inputs) {
-            var filterValues = [];
+let elr = elrUtlities();
 
-            $.each($inputs, function(k,v) {
-                var $that = $(v);
+$.extend($.expr[':'], {
+    containsNC: function(elem, i, match) {
+        return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || '').toLowerCase()) >= 0;
+    }
+});
 
-                if ( $.trim($that.val()).length ) {
-                    filterValues.push(v);
-                }
+const elrTableFilter = function({
+    tableClass = 'elr-searchable-table',
+    searchInput = 'elr-search-table'
+} = {}) {
+    // const self = {};
+    const $table = $(`.${tableClass}`);
 
-                return filterValues;
-            });
+    const getFilterValues = function($inputs) {
+        let filterValues = [];
 
-            return filterValues;
-        };
-
-        var getRows = function($fullRows, filterValues) {
-            $.each(filterValues, function(k,v) {
-                var $that = $(v);
-                var input = $.trim($that.val()).toLowerCase();
-                var columnNum = $that.closest('th').index();
-
-                if ( filterValues.length === 1 ) {
-                    $rows = $fullRows.has('td:eq(' + columnNum + '):containsNC(' + input + ')');
-                } else if ( k === 0 ) {
-                    $rows = $fullRows.has('td:eq(' + columnNum + '):containsNC(' + input + ')');
-                } else {
-                    $rows = $rows.has('td:eq(' + columnNum + '):containsNC(' + input + ')');
-                }
-
-                return $rows;
-            });
-
-            return $rows;
-        };
-
-        var filterRows = function($fullRows, filterValues) {
-            var $rows;
-
-            if ( filterValues.length === 0 ) {
-                $rows = $fullRows;
-            } else {
-                $rows = getRows($fullRows, filterValues);
+        elr.each($inputs, function(k, v) {
+            if (elr.trim($(v).val())) {
+                filterValues.push(v);
             }
 
-            return $rows;
-        };
-
-        var renderTable = function($table, $filteredRows) {
-            var $tableBody = $table.find('tbody').empty();
-
-            $.each($filteredRows, function(k,v) {
-                $tableBody.append(v);
-            });
-        };
-
-        $table.on('keyup', 'input.' + searchInput, function() {
-            var filterValues = getFilterValues($inputs);
-            var $filteredRows = filterRows($fullRows, filterValues);
-            
-            renderTable($table, $filteredRows);
+            return filterValues;
         });
 
-        return self;
+        return filterValues;
     };
-})(jQuery);
+
+    const getRows = function($fullRows, filterValues) {
+        let $newRows;
+
+        const filter = function(k, v, $newRows, $fullRows) {
+            const $that = $(v);
+            const input = elr.trim($that.val()).toLowerCase();
+            const columnNum = $that.closest('th').index();
+
+            if (filterValues.length === 1) {
+                return $fullRows.has(`td:eq(${columnNum}):containsNC(${input})`);
+            } else if (k === 0) {
+                return $fullRows.has(`td:eq(${columnNum}):containsNC(${input})`);
+            } else {
+                return $newRows.has(`td:eq(${columnNum}):containsNC(${input})`);
+            }
+        };
+
+        elr.each(filterValues, function(k, v) {
+            $newRows = filter(k, v, $newRows, $fullRows);
+
+            return $newRows;
+        });
+
+        return $newRows;
+    };
+
+    const filterRows = function($fullRows, filterValues) {
+        if (filterValues.length === 0) {
+            return $fullRows;
+        }
+
+        return getRows($fullRows, filterValues);
+    };
+
+    const renderTable = function($table, $filteredRows) {
+        const $tableBody = $table.find('tbody').empty();
+
+        elr.each($filteredRows, function(k,v) {
+            $tableBody.append(v);
+        });
+    };
+
+    $table.each(function() {
+        const $that = $(this);
+        const $fullRows = $that.find('tbody tr');
+        const $inputs = $that.find('th').find(`.${searchInput}`);
+
+        $that.on('keyup', `input.${searchInput}`, function() {
+            const filterValues = getFilterValues($inputs);
+            const $filteredRows = filterRows($fullRows, filterValues);
+
+            renderTable($that, $filteredRows);
+        });
+    });
+
+    // return self;
+};
+
+export default elrTableFilter;
