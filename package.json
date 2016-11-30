@@ -1,6 +1,6 @@
 {
   "name": "elr-tablefilter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "filter tabular data",
   "main": "dist/elr-tablefilter.js",
   "repository": {
