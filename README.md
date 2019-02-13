@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/Beth3346/elr-tablefilter.svg?branch=master)](https://travis-ci.org/Beth3346/elr-tablefilter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/Beth3346/elr-tablefilter/branch/master/graph/badge.svg)](https://codecov.io/gh/Beth3346/elr-tablefilter)
-[![npm](https://img.shields.io/npm/dm/elr-tablefilter.svg?style=flat)]()
+[![npm](https://img.shields.io/npm/dm/elr-tablefilter.svg?style=flat)]() [![Greenkeeper badge](https://badges.greenkeeper.io/Beth3346/elr-tablefilter.svg)](https://greenkeeper.io/)
 
 filter tabular data
 
